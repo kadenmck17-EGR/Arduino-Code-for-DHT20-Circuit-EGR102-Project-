@@ -1,0 +1,39 @@
+ #include <LiquidCrystal.h>
+#include "DFRobot_DHT20.h" //use the specific sensor information
+LiquidCrystal lcd(12,11,5,4,3,2);
+DFRobot_DHT20 dht20;
+
+void setup() {
+  dht20.begin();// put your setup code here, to run once
+  lcd.begin(16,2);//LCD screen is 16 characters by 2 lines
+  Serial.begin(9600);
+  Serial.println("LABEL,Temp,Humidity,");
+}
+
+void loop() {
+  
+  float h = dht20.getHumidity()*100; //value for humidity
+  float t = dht20.getTemperature(); //Value for temperature
+  //t = t * 9 / 5 + 32; //optional (disabled by default) change reading from Celsius to Fahrenheit
+  if (isnan(t) || isnan(h)) { //check that DHT sensor is working 
+    lcd.setCursor(0,0); //sets cursor to line 1 of lcd
+    lcd.print ("Failed to read"); // If DHT is not working, display this
+    lcd.setCursor(0,1); //sets cursor to line 2 of lcd
+     lcd.print ("from sensor");
+  } else { //Otherwise show the readings on the screen
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Humidity: ");
+    lcd.print(h);
+    lcd.print("%");
+    lcd.setCursor(0,1);
+    lcd.print("Temp:");
+    lcd.print(t);
+    lcd.print("C");
+    Serial.print(t); //prints temperature variable to serial output (connect to microsoft data streamer for excel)
+    Serial.print(","); //syntax correction
+    Serial.print(h); //prints humidity variable to serial output (connect to microsoft data streamer for excel)
+    Serial.println(); //starts new line after each print
+  }
+  delay(300000); //loop interval (default 300000ms or 5 minutes)
+}
